@@ -1,9 +1,30 @@
 {
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 		{
+			"path": "pages/warning/index",
+			"style": {
+				"navigationBarTitleText": "警告"
+			}
+		},
+		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "uni-app"
+				"navigationBarTitleText": "index",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/layoutOption/index",
+			"style": {
+				"navigationBarTitleText": "index",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/uplist/index",
+			"style": {
+				"navigationBarTitleText": "index",
+				"navigationStyle": "custom"
 			}
 		}
 	],

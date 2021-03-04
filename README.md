@@ -1,19 +1,4 @@
 # ddmonitor-uniapp
 
-## Project setup
-```
-yarn install
-```
-
-### Compiles and hot-reloads for development
-```
-yarn serve
-```
-
-### Compiles and minifies for production
-```
-yarn build
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+- 第一版先出炉了。
+- 要什么自行车，能用就行。
