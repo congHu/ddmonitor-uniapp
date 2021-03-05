@@ -1,5 +1,5 @@
 <template>
-  <view class="content">
+  <view class="content" :style="'margin-top:'+safeAreaInsetsTop+'px'">
     <view class="topbar">
       <view class="btn" @click="goback">取消</view>
       <view class="title">更改布局方式</view>
@@ -15,6 +15,16 @@
 
 <script>
 export default {
+  data() {
+    return {
+      safeAreaInsetsTop: 0
+    }
+  },
+  onShow() {
+    const info = uni.getSystemInfoSync()
+    this.safeAreaInsetsTop = info.safeAreaInsets.top
+    // this.safeHeight = info.safeArea.height
+  },
   methods: {
     goback() {
       uni.navigateBack()
@@ -34,17 +44,22 @@ export default {
 </script>
 
 <style>
+body {
+  background-color: #31363b;
+  color: white;
+}
 .content {
   display: flex;
   flex-direction: column;
-  background-color: #31363b;
   height: 100vh;
+  /* flex: 1; */
+
 }
 .topbar {
   display: flex;
   background-color: #31363b;
   border-bottom: 1px solid #808080;
-  color: white;
+  border-top: 1px solid #808080;
 }
 .topbar .btn {
   padding: 4px;

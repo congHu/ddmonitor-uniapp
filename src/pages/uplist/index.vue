@@ -1,5 +1,5 @@
 <template>
-  <view class="content">
+  <view class="content" :style="'margin-top:'+safeAreaInsetsTop+'px'">
     <view class="topbar">
       <view class="btn" @click="goback">完成</view>
       <view class="title">列表</view>
@@ -10,7 +10,7 @@
         <span v-if="i <= liveids.length && !isNaN(liveids[i-1]) && liveids[i-1] > 0">
           <span v-if="liveInfos.hasOwnProperty(liveids[i-1])">
             <image style="width:40px;height:40px" :src="liveInfos[liveids[i-1]].face">
-            {{liveInfos[liveids[i-1]].upname}} {{liveInfos[liveids[i-1]].title}}
+            {{liveInfos[liveids[i-1]].isLive == 1 ? '直播中':'未开播'}} {{liveInfos[liveids[i-1]].upname}} {{liveInfos[liveids[i-1]].title}}
           </span>
           <span v-else>...</span>
         </span>
@@ -24,7 +24,7 @@
       <view class="list-item" hover-class="list-item-hover" v-for="liveid in saveids" :key="liveid" @click="saveItemClick(liveid)">
         <span v-if="liveInfos.hasOwnProperty(liveid)">
           <image style="width:40px;height:40px" :src="liveInfos[liveid].face">
-          {{liveInfos[liveid].upname}} {{liveInfos[liveid].title}}
+          {{liveInfos[liveid].isLive == 1 ? '直播中':'未开播'}} {{liveInfos[liveid].upname}} {{liveInfos[liveid].title}}
         </span>
         <span v-else>...</span>
       </view>
@@ -37,6 +37,7 @@
 export default {
   data() {
     return {
+      safeAreaInsetsTop: 0,
       liveids: [],
       saveids: [],
       liveInfos: {},
@@ -63,6 +64,11 @@ export default {
       this.loadLiveInfo(liveid)
     })
   },
+  onShow() {
+    const info = uni.getSystemInfoSync()
+    this.safeAreaInsetsTop = info.safeAreaInsets.top
+    // this.safeHeight = info.safeArea.height
+  },
   methods: {
     loadLiveInfo(liveid) {
       if (liveid > 0 && !this.liveInfos.hasOwnProperty(liveid)) {
@@ -75,7 +81,8 @@ export default {
               that.$set(that.liveInfos, liveid, {
                 title: res.data.data.room_info.title,
                 upname: res.data.data.anchor_info.base_info.uname,
-                face: res.data.data.anchor_info.base_info.face
+                face: res.data.data.anchor_info.base_info.face,
+                isLive: res.data.data.room_info.live_status
               })
             }catch{
             }
@@ -99,6 +106,7 @@ export default {
         if (res.index == 0) {
           this.saveids.push(res.value)
           this.loadLiveInfo(res.value)
+          uni.setStorageSync('saveids', this.saveids.join(" "))
         }
       })
     },
@@ -179,17 +187,21 @@ export default {
 </script>
 
 <style>
+body {
+  background-color: #31363b;
+  color: white;
+}
 .content {
   display: flex;
   flex-direction: column;
-  background-color: #31363b;
   height: 100vh;
-  color: white;
 }
 .topbar {
   display: flex;
   background-color: #31363b;
   border-bottom: 1px solid #808080;
+  border-top: 1px solid #808080;
+
 }
 .topbar .btn {
   padding: 4px;

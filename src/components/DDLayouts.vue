@@ -211,10 +211,14 @@ export default {
 
 <style>
 .container {
-  height: 100%;
+  /* height: 100%; */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 .layout {
-  height: 100%;
+  /* height: 100%; */
+  flex: 1;
   display: flex;
 }
 .layout2,.layout3,.layout5-2,.layout6,.layout7,.layout8,.layout9-2,.layout10,.layout11,.layout12,.layout12-1-2,.layout13,.layout14,.layout14-1-2,.layout15 {
