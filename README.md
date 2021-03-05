@@ -12,12 +12,12 @@
 
 ## TODO&BUG
 
-[] 界面美观需要改进
-[] "UP列表"页面需要改进
-[] 弹幕在解析时出现了一些问题，导致不能获取所有弹幕。
-[] 清晰度切换
-[] 从uid公开关注列表选择导入UP主。
-[] iPhone未做测试。安卓11未做测试。
+- [] 界面美观需要改进
+- [] "UP列表"页面需要改进
+- [] 弹幕在解析时出现了一些问题，导致不能获取所有弹幕。
+- [] 清晰度切换
+- [] 从uid公开关注列表选择导入UP主。
+- [] iPhone未做测试。安卓11未做测试。
 
 ## 考虑是否需要的功能
 
@@ -27,7 +27,7 @@
 
 ## 源码运行
 
-使用HBuilderX，详见[https://uniapp.dcloud.io/quickstart?id=%e8%bf%90%e8%a1%8cuni-app](https://uniapp.dcloud.io/quickstart?id=%e8%bf%90%e8%a1%8cuni-app)
+使用HBuilderX，详见[https://uniapp.dcloud.io/quickstart?id=运行uni-app](https://uniapp.dcloud.io/quickstart?id=运行uni-app)
 
 需要注意的是，本工程由vue-cli生成，在HBuilderX运行之前可能需要先安装好依赖库
 
