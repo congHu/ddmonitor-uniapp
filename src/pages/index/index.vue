@@ -32,11 +32,32 @@ export default {
         height: 0,
       },
       safeHeight: 0,
-      landScapeObs: null
+      landScapeObs: null,
+      saveids: [],
+      liveStatus: {}
     };
   },
   onLoad() {
-    
+    setInterval(() => {
+      this.saveids.forEach(liveid => {
+        let that = this
+        uni.request({
+          url: 'https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id=' + liveid,
+          success(res) {
+            // console.log(res)
+            const newStatus = res.data.data.room_info.live_status
+            if (newStatus == 1 && that.liveStatus[liveid] == 0) {
+              uni.showToast({
+                title: res.data.data.anchor_info.base_info.uname + ' 开播了'
+              })
+            }
+            
+            that.$set(that.liveStatus, liveid, newStatus)
+
+          }
+        })
+      })
+    }, 10000);
     
   },
   // mounted() {
@@ -58,23 +79,60 @@ export default {
     uni.setKeepScreenOn({
       keepScreenOn: true
     })
+    let layoutChanged = false
     const layout = uni.getStorageSync('layout')
     if (layout) {
-      this.layout =  layout
+      if (this.layout != layout) {
+        layoutChanged = true
+        this.layout = layout
+      }
     }
-    const liveids = uni.getStorageSync('liveids')
-    console.log("liveids", liveids)
-    if (liveids) {
-      this.liveids = liveids.split(" ")
-    }
+
     const info = uni.getSystemInfoSync()
     console.log("info", info)
     this.safeArea = {...info.safeArea}
-    console.log("safearea", this.safeArea)
     // this.safeHeight = info.safeArea.height
-    this.$nextTick(() => {
-      this.refreshAll()
-    })
+    console.log("safearea", this.safeArea)
+
+
+    const liveids = uni.getStorageSync('liveids')
+    console.log("liveids", liveids)
+    
+    if (liveids) {
+      const liveidList = liveids.split(" ")
+      if (liveidList.length == this.liveids.length) {
+        let liveidsChanged = false
+        for (let i in liveidList) {
+          if (liveidList[i] != this.liveids[i]) {
+            liveidsChanged = true
+            this.liveids = liveidList
+            // this.refreshAll()
+
+            this.$nextTick(() => {
+              this.refreshAll()
+            })
+            break
+          }
+        }
+        if (layoutChanged && !liveidsChanged) {
+          this.$nextTick(() => {
+            this.refreshAll()
+          })
+        }
+      }else{
+        this.liveids = liveidList
+        // this.refreshAll()
+
+        this.$nextTick(() => {
+          this.refreshAll()
+        })
+      }
+    }
+
+    const saveids = uni.getStorageSync('liveids')
+    if (saveids) {
+      this.saveids = saveids.split(" ")
+    }
   },
   onResize() {
     const info = uni.getSystemInfoSync()

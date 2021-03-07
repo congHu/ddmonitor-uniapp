@@ -1,34 +1,35 @@
 <template>
-  <view class="content" :style="'margin-top:'+safeAreaInsetsTop+'px'">
-    <view class="topbar">
+  <!-- :style="'margin-top:'+safeAreaInsetsTop+'px'" -->
+  <view class="content">
+    <!-- <view class="topbar">
       <view class="btn" @click="goback">完成</view>
       <view class="title">列表</view>
-    </view>
-    <view class="scrollview">
-      <view class="list-item" hover-class="list-item-hover" v-for="i in 9" :key="i" @click="layoutItemClick(i)">
-        窗口{{i}} 
-        <span v-if="i <= liveids.length && !isNaN(liveids[i-1]) && liveids[i-1] > 0">
-          <span v-if="liveInfos.hasOwnProperty(liveids[i-1])">
-            <image style="width:40px;height:40px" :src="liveInfos[liveids[i-1]].face">
-            {{liveInfos[liveids[i-1]].isLive == 1 ? '直播中':'未开播'}} {{liveInfos[liveids[i-1]].upname}} {{liveInfos[liveids[i-1]].title}}
-          </span>
-          <span v-else>...</span>
-        </span>
-        <span v-else>空</span>
-      </view>
-      <view style="padding:8px;border-bottom:1px solid #808080;">
-        <span style="font-size:18px;font-weight:bold;">你的列表</span>
-        <span style="margin-left:8px;border: 1px solid #808080;padding:4px" @click="addByLiveid">添加</span>
-        <!-- <span style="margin-left:8px;border: 1px solid #808080;padding:4px" @click="addByImport">导入</span> -->
-      </view>
-      <view class="list-item" hover-class="list-item-hover" v-for="liveid in saveids" :key="liveid" @click="saveItemClick(liveid)">
-        <span v-if="liveInfos.hasOwnProperty(liveid)">
-          <image style="width:40px;height:40px" :src="liveInfos[liveid].face">
-          {{liveInfos[liveid].isLive == 1 ? '直播中':'未开播'}} {{liveInfos[liveid].upname}} {{liveInfos[liveid].title}}
+    </view> -->
+    <!-- <view class="scrollview"> -->
+    <view class="list-item" hover-class="list-item-hover" v-for="i in 9" :key="i" @click="layoutItemClick(i)">
+      窗口{{i}} 
+      <span v-if="i <= liveids.length && !isNaN(liveids[i-1]) && liveids[i-1] > 0">
+        <span v-if="liveInfos.hasOwnProperty(liveids[i-1])">
+          <image style="width:40px;height:40px" :src="liveInfos[liveids[i-1]].face">
+          {{liveInfos[liveids[i-1]].isLive == 1 ? '直播中':'未开播'}} {{liveInfos[liveids[i-1]].upname}} {{liveInfos[liveids[i-1]].title}}
         </span>
         <span v-else>...</span>
-      </view>
+      </span>
+      <span v-else>空</span>
     </view>
+    <view style="padding:8px;border-bottom:1px solid #808080;">
+      <span style="font-size:18px;font-weight:bold;">你的列表</span>
+      <span style="margin-left:8px;border: 1px solid #808080;padding:4px;font-size:13px" @click="addByLiveid">添加</span>
+      <!-- <span style="margin-left:8px;border: 1px solid #808080;padding:4px" @click="addByImport">导入</span> -->
+    </view>
+    <view class="list-item" hover-class="list-item-hover" v-for="liveid in saveids" :key="liveid" @click="saveItemClick(liveid)">
+      <span v-if="liveInfos.hasOwnProperty(liveid)">
+        <image style="width:40px;height:40px" :src="liveInfos[liveid].face">
+        {{liveInfos[liveid].isLive == 1 ? '直播中':'未开播'}} {{liveInfos[liveid].upname}} {{liveInfos[liveid].title}}
+      </span>
+      <span v-else>...</span>
+    </view>
+    <!-- </view> -->
     
   </view>
 </template>
@@ -192,16 +193,16 @@ body {
   color: white;
 }
 .content {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
+  /* display: flex; */
+  /* flex-direction: column; */
+  /* height: 100vh; */
 }
 .topbar {
   display: flex;
   background-color: #31363b;
   border-bottom: 1px solid #808080;
   border-top: 1px solid #808080;
-
+  font-size: 13px;
 }
 .topbar .btn {
   padding: 4px;
@@ -225,6 +226,7 @@ body {
 .list-item {
   padding: 8px;
   border-bottom: 1px solid #808080;
+  font-size: 14px;
 }
 .list-item-hover {
   background-color: #1b1e20;

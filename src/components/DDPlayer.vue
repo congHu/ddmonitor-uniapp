@@ -19,7 +19,7 @@
       @ended="videoended"
       @error="videoerr"
     >
-      <cover-view v-show="showDanmu" v-for="(d,i) in danmuList" :key="i">
+      <cover-view class="danmu" v-show="showDanmu" v-for="(d,i) in danmuList" :key="i">
         {{d}}
       </cover-view>
     </video>
@@ -76,8 +76,9 @@ export default {
       if (this.socketTask) {
         this.socketTask.close()
       }
+      this.danmuList = []
       if (this.socketTimer) clearInterval(this.socketTimer)
-      this.videoCtx.stop()
+      if (this.videoCtx) this.videoCtx.stop()
       this.url = ''
       this.upname = ''
       let that = this
@@ -267,11 +268,11 @@ export default {
   background-color: #31363b;
   overflow: hidden;
   border-top: 1px solid #808080;
+  font-size: 13px;
 }
 .toolbar .btn {
   padding: 4px;
   border-right: 1px solid #808080;
-
 }
 .toolbar .upname {
   padding: 4px;
@@ -281,6 +282,10 @@ export default {
   width: 0;
 }
 .muted {
+  background-color: rgba(0, 0, 0, .6);
+}
+.danmu {
+  font-size: 13px;
   background-color: rgba(0, 0, 0, .6);
 }
 </style>

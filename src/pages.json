@@ -10,15 +10,13 @@
 		{
 			"path": "pages/layoutOption/index",
 			"style": {
-				"navigationBarTitleText": "index",
-				"navigationStyle": "custom"
+				"navigationBarTitleText": "更改布局方式"
 			}
 		},
 		{
 			"path": "pages/uplist/index",
 			"style": {
-				"navigationBarTitleText": "index",
-				"navigationStyle": "custom"
+				"navigationBarTitleText": "UP列表"
 			}
 		}
 	],

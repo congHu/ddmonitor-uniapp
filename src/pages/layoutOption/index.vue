@@ -1,14 +1,15 @@
 <template>
-  <view class="content" :style="'margin-top:'+safeAreaInsetsTop+'px'">
-    <view class="topbar">
+ <!-- :style="'margin-top:'+safeAreaInsetsTop+'px'" -->
+  <view class="content">
+    <!-- <view class="topbar">
       <view class="btn" @click="goback">取消</view>
       <view class="title">更改布局方式</view>
-    </view>
-    <view class="scrollview">
+    </view> -->
+    <!-- <view class="scrollview"> -->
       <!--  -->
-      <view v-for="i in 16" :key="i-1" class="layout-item" :style="'background-position: '+(((i-1)%4)*33.33)+'% '+(Math.floor((i-1)/4)*33.33)+'%'" @click="selectLayout(i-1)">
-      </view>
+    <view v-for="i in 16" :key="i-1" class="layout-item" :style="'background-position: '+(((i-1)%4)*33.33)+'% '+(Math.floor((i-1)/4)*33.33)+'%'" @click="selectLayout(i-1)">
     </view>
+    <!-- </view> -->
     
   </view>
 </template>
@@ -49,9 +50,9 @@ body {
   color: white;
 }
 .content {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
+  /* display: flex; */
+  /* flex-direction: column; */
+  /* height: 100vh; */
   /* flex: 1; */
 
 }
@@ -60,6 +61,7 @@ body {
   background-color: #31363b;
   border-bottom: 1px solid #808080;
   border-top: 1px solid #808080;
+  font-size: 13px;
 }
 .topbar .btn {
   padding: 4px;
