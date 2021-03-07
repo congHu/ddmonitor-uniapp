@@ -49,31 +49,6 @@ body {
   background-color: #31363b;
   color: white;
 }
-.content {
-  /* display: flex; */
-  /* flex-direction: column; */
-  /* height: 100vh; */
-  /* flex: 1; */
-
-}
-.topbar {
-  display: flex;
-  background-color: #31363b;
-  border-bottom: 1px solid #808080;
-  border-top: 1px solid #808080;
-  font-size: 13px;
-}
-.topbar .btn {
-  padding: 4px;
-  border-right: 1px solid #808080;
-}
-.topbar .title {
-  padding: 4px 8px;
-}
-.scrollview {
-  flex: 1;
-  overflow: scroll;
-}
 .layout-item {
   width: 25%;
   padding-bottom: 15%;

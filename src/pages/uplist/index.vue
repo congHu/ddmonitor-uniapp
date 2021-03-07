@@ -7,27 +7,27 @@
     </view> -->
     <!-- <view class="scrollview"> -->
     <view class="list-item" hover-class="list-item-hover" v-for="i in 9" :key="i" @click="layoutItemClick(i)">
-      窗口{{i}} 
+      窗口{{i}}：
       <span v-if="i <= liveids.length && !isNaN(liveids[i-1]) && liveids[i-1] > 0">
         <span v-if="liveInfos.hasOwnProperty(liveids[i-1])">
           <image style="width:40px;height:40px" :src="liveInfos[liveids[i-1]].face">
           {{liveInfos[liveids[i-1]].isLive == 1 ? '直播中':'未开播'}} {{liveInfos[liveids[i-1]].upname}} {{liveInfos[liveids[i-1]].title}}
         </span>
-        <span v-else>...</span>
+        <span v-else>加载...</span>
       </span>
       <span v-else>空</span>
     </view>
-    <view style="padding:8px;border-bottom:1px solid #808080;">
-      <span style="font-size:18px;font-weight:bold;">你的列表</span>
-      <span style="margin-left:8px;border: 1px solid #808080;padding:4px;font-size:13px" @click="addByLiveid">添加</span>
+    <view class="list-title-view">
+      <span class="list-title">你的列表</span>
+      <span class="list-title-btn" @click="addByLiveid">添加</span>
       <!-- <span style="margin-left:8px;border: 1px solid #808080;padding:4px" @click="addByImport">导入</span> -->
     </view>
     <view class="list-item" hover-class="list-item-hover" v-for="liveid in saveids" :key="liveid" @click="saveItemClick(liveid)">
       <span v-if="liveInfos.hasOwnProperty(liveid)">
-        <image style="width:40px;height:40px" :src="liveInfos[liveid].face">
+        <image class="head-image" :src="liveInfos[liveid].face">
         {{liveInfos[liveid].isLive == 1 ? '直播中':'未开播'}} {{liveInfos[liveid].upname}} {{liveInfos[liveid].title}}
       </span>
-      <span v-else>...</span>
+      <span v-else>加载...</span>
     </view>
     <!-- </view> -->
     
@@ -192,37 +192,6 @@ body {
   background-color: #31363b;
   color: white;
 }
-.content {
-  /* display: flex; */
-  /* flex-direction: column; */
-  /* height: 100vh; */
-}
-.topbar {
-  display: flex;
-  background-color: #31363b;
-  border-bottom: 1px solid #808080;
-  border-top: 1px solid #808080;
-  font-size: 13px;
-}
-.topbar .btn {
-  padding: 4px;
-  border-right: 1px solid #808080;
-}
-.topbar .title {
-  padding: 4px 8px;
-}
-.scrollview {
-  flex: 1;
-  overflow: scroll;
-}
-.layout-item {
-  width: 25%;
-  padding-bottom: 15%;
-  background-image: url('/static/layouts.png');
-  background-size: 400%;
-  /* background-position: 33.33% 33.33%; */
-  float: left;
-}
 .list-item {
   padding: 8px;
   border-bottom: 1px solid #808080;
@@ -230,5 +199,23 @@ body {
 }
 .list-item-hover {
   background-color: #1b1e20;
+}
+.list-title-view {
+  padding: 8px;
+  border-bottom: 1px solid #808080;
+}
+.list-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+.list-title-btn {
+  margin-left: 8px;
+  border: 1px solid #808080;
+  padding: 4px;
+  font-size: 13px
+}
+.head-image {
+  width: 40px;
+  height: 40px;
 }
 </style>
