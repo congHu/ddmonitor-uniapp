@@ -1,13 +1,15 @@
 <template>
   <view class="content" :style="'padding: '+safeArea.top+'px '+(safeArea.right-safeArea.width-safeArea.left)+'px '+(safeArea.bottom-safeArea.height-safeArea.top)+'px '+safeArea.left+'px; height: '+safeArea.height+'px'">
     <view class="topbar">
-      <view class="btn" @click="refreshAll">全部刷新</view>
-      <view class="btn" @click="muteAll">全部静音</view>
-      <view class="btn" @click="danmuCloseAll">弹幕全关</view>
+      <view class="btn">全局</view>
+      <view class="btn iconfont" @click="refreshAll">&#xe618;</view>
+      <view class="btn iconfont" @click="muteAll">&#xe747;</view>
+      <view class="btn iconfont" @click="danmuCloseAll">&#xe696;</view>
       <view style="flex:1"></view>
-      <view class="btn right" @click="toggleLandscape">{{lockLandscape?'解锁横屏':'锁定横屏'}}</view>
-      <view class="btn right" @click="openLayoutOption">更改布局</view>
-      <view class="btn right" @click="openUpList">UP列表</view>
+      <view class="btn right iconfont" @click="openTimerOption">&#xe645;{{autoCloseMinute>0?autoCloseMinute:''}}</view>
+      <view :class="'btn right iconfont' + (lockLandscape ? ' active' : '')" @click="toggleLandscape">&#xe664;</view>
+      <view class="btn right iconfont" @click="openLayoutOption">&#xebe5;</view>
+      <view class="btn right iconfont" @click="openUpList">&#xe64f;</view>
     </view>
     <DDLayouts :layout="layout" :liveids="liveids" ref="dd" />
 
@@ -34,13 +36,25 @@ export default {
       safeHeight: 0,
       landScapeObs: null,
       saveids: [],
-      liveStatus: {}
+      liveStatus: {},
+      autoCloseMinute: 0,
+      autoCloseStarted: false
     };
   },
   onLoad() {
+    const saveids = uni.getStorageSync('liveids')
+    if (saveids) {
+      this.saveids = saveids.split(" ")
+    }else{
+      this.saveids = [47377,8792912,21652717,213]
+      uni.setStorageSync('saveids', this.saveids.join(" "))
+    }
+    
     setInterval(() => {
+      // console.log("saveids", this.saveids)
       this.saveids.forEach(liveid => {
         let that = this
+        // console.log('https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id=' + liveid)
         uni.request({
           url: 'https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id=' + liveid,
           success(res) {
@@ -58,6 +72,25 @@ export default {
         })
       })
     }, 10000);
+
+    setInterval(() => {
+      let time = getApp().globalData.autoCloseTime
+      // console.log("time",time)
+      this.autoCloseMinute = Math.ceil(time/60)
+      if (time > 0) {
+        this.autoCloseStarted = true
+        getApp().globalData.autoCloseTime -= 1
+      }else{
+        if (this.autoCloseStarted) {
+          this.autoCloseStarted = false
+          uni.setKeepScreenOn({
+            keepScreenOn: false
+          })
+          this.pauseAll()
+        }
+      }
+      
+    }, 1000);
     
   },
   // mounted() {
@@ -76,6 +109,7 @@ export default {
   //   })
   // },
   onShow() {
+    console.log("index onshow")
     uni.setKeepScreenOn({
       keepScreenOn: true
     })
@@ -118,6 +152,9 @@ export default {
           this.$nextTick(() => {
             this.refreshAll()
           })
+        }else{
+          console.log("keep play")
+          this.keepPlayAll()
         }
       }else{
         this.liveids = liveidList
@@ -129,7 +166,7 @@ export default {
       }
     }
 
-    const saveids = uni.getStorageSync('liveids')
+    const saveids = uni.getStorageSync('saveids')
     if (saveids) {
       this.saveids = saveids.split(" ")
     }
@@ -158,6 +195,12 @@ export default {
     danmuCloseAll() {
       this.$refs.dd.danmuCloseAll()
     },
+    keepPlayAll() {
+      this.$refs.dd.keepPlayAll()
+    },
+    pauseAll() {
+      this.$refs.dd.pauseAll()
+    },
     toggleLandscape() {
       this.lockLandscape = !this.lockLandscape
       if (this.lockLandscape) {
@@ -175,6 +218,11 @@ export default {
       uni.navigateTo({
         url: '/pages/uplist/index'
       })
+    },
+    openTimerOption() {
+      uni.navigateTo({
+        url: '/pages/timerOption/index'
+      })
     }
   },
   destroyed() {
@@ -184,6 +232,22 @@ export default {
 </script>
 
 <style>
+@font-face {
+  font-family: 'iconfont';
+  src: url('/static/iconfont/iconfont.eot');
+  src: url('/static/iconfont/iconfont.eot?#iefix') format('embedded-opentype'),
+      url('/static/iconfont/iconfont.woff2') format('woff2'),
+      url('/static/iconfont/iconfont.woff') format('woff'),
+      url('/static/iconfont/iconfont.ttf') format('truetype'),
+      url('/static/iconfont/iconfont.svg#iconfont') format('svg');
+}
+.iconfont {
+  font-family: "iconfont" !important;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 18px;
+}
 body {
   background-color: #31363b;
   color: white;
@@ -218,5 +282,8 @@ DDLayout {
   border-right: none;
   border-left: 1px solid #808080;
 
+}
+.active {
+  background-color: rgba(0, 0, 0, .6);
 }
 </style>

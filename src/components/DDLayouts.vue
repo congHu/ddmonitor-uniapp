@@ -204,6 +204,20 @@ export default {
           this.$refs['dd'+i].danmuClose()
         }
       }
+    },
+    keepPlayAll() {
+      for (let i=0; i < 9; i++) {
+        if (this.$refs['dd'+i]) {
+          this.$refs['dd'+i].keepPlay()
+        }
+      }
+    },
+    pauseAll() {
+      for (let i=0; i < 9; i++) {
+        if (this.$refs['dd'+i]) {
+          this.$refs['dd'+i].pause()
+        }
+      }
     }
   }
 }

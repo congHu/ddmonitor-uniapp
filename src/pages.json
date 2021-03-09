@@ -18,6 +18,12 @@
 			"style": {
 				"navigationBarTitleText": "UP列表"
 			}
+		},
+		{
+			"path": "pages/timerOption/index",
+			"style": {
+				"navigationBarTitleText": "定时关闭"
+			}
 		}
 	],
 	"globalStyle": {

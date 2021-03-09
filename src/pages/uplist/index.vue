@@ -22,7 +22,7 @@
       <span class="list-title-btn" @click="addByLiveid">添加</span>
       <!-- <span style="margin-left:8px;border: 1px solid #808080;padding:4px" @click="addByImport">导入</span> -->
     </view>
-    <view class="list-item" hover-class="list-item-hover" v-for="liveid in saveids" :key="liveid" @click="saveItemClick(liveid)">
+    <view class="list-item" hover-class="list-item-hover" v-for="(liveid,i) in saveids" :key="liveid" @click="saveItemClick(i)">
       <span v-if="liveInfos.hasOwnProperty(liveid)">
         <image class="head-image" :src="liveInfos[liveid].face">
         {{liveInfos[liveid].isLive == 1 ? '直播中':'未开播'}} {{liveInfos[liveid].upname}} {{liveInfos[liveid].title}}
@@ -161,11 +161,12 @@ export default {
         })
       }
     },
-    saveItemClick(liveid) {
+    saveItemClick(i) {
       let buttons = []
       for (let j = 1; j <= 9; j++) {
         buttons.push({title: "窗口"+j})
       }
+      buttons.push({title: '从列表移除', style: "destructive"})
       plus.nativeUI.actionSheet({
         title: '添加到',
         buttons: buttons,
@@ -173,12 +174,18 @@ export default {
       }, e => {
         console.log(e.index)
         if (e.index > 0) {
-          while (e.index - 1 > this.liveids.length) {
-            this.liveids.push(0)
+          if (e.index >= 9) {
+            this.saveids.splice(i, 1)
+            uni.setStorageSync("saveids", this.saveids.join(" "))
+          }else{
+            while (e.index - 1 > this.liveids.length) {
+              this.liveids.push(0)
+            }
+            this.$set(this.liveids, e.index-1, this.saveids[i])
+            // this.liveids[e.index-1] = liveid
+            uni.setStorageSync("liveids", this.liveids.join(" "))
+            
           }
-          this.$set(this.liveids, e.index-1, liveid)
-          // this.liveids[e.index-1] = liveid
-          uni.setStorageSync("liveids", this.liveids.join(" "))
           
         }
       })

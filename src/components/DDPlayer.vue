@@ -24,9 +24,9 @@
       </cover-view>
     </video>
     <view class="toolbar">
-      <view class="btn" @click="loadUrl">刷</view>
-      <view :class="'btn' + (isMuted ? ' muted' : '')" @click="toggleMute">静</view>
-      <view :class="'btn' + (showDanmu ? '' : ' muted')" @click="toggleDanmu">弹</view>
+      <view class="btn iconfont" @click="loadUrl">&#xe618;</view>
+      <view :class="'btn iconfont' + (isMuted ? ' active' : '')" @click="toggleMute">&#xe747;</view>
+      <view :class="'btn iconfont' + (showDanmu ? '' : ' active')" @click="toggleDanmu">&#xe696;</view>
       <view class="upname">{{upname}}</view>
     </view>
   </view>
@@ -126,7 +126,7 @@ export default {
             })
 
             that.socketTask.onOpen((res) => {
-              console.log("socket open")
+              console.log("socket open", roomid)
               const reqStr = JSON.stringify({"roomid":roomid})
               let data = [
                 0,0,0,reqStr.length+16,
@@ -155,15 +155,21 @@ export default {
                 try {
                   const unziped = pako.inflate(bytes.slice(16,bytes.length))
                   // console.log(unziped)
+                  // let td = new TextDecoder('utf-8')
+                  // try{
+
+                  // }catch{
+
+                  // }
                   const danmu = that.getDanmu(unziped)
                   if (danmu) {
-                    console.log("danmu", roomid, danmu)
+                    // console.log("danmu", roomid, danmu)
                     // that.videoCtx.sendDanmu({
                     //   text: danmu,
                     //   color: '#ffffff'
                     // })
-                    that.danmuList.push(danmu)
-                    if (that.danmuList.length > 5) that.danmuList.shift()
+                    that.danmuList.push(...danmu)
+                    if (that.danmuList.length > 5) that.danmuList.splice(0,that.danmuList.length-5)
                   }
                 }catch{
 
@@ -178,7 +184,7 @@ export default {
               // }
             })
             that.socketTask.onClose((res) => {
-              console.log('ws close', roomid);
+              console.log('socker close', roomid, res);
             })
             that.socketTask.onError((err) => {
               console.log("ws err", err)
@@ -209,27 +215,44 @@ export default {
       // }
       // console.log(data, data.slice(16,data.length))
       // console.log(data.subarray(0,16), data[16])
-      let sp = data.subarray(16, data.length)
+      // let sp = data.subarray(16, data.length)
       // console.log(sp[sp.length-1])
-      let jstr = new TextDecoder('utf-8').decode(sp)
-      // console.log(typeof jstr)
-      try{
-        const jo = JSON.parse(jstr)
-        console.log(jo)
-        if (jo.cmd == "DANMU_MSG") return jo.info[1]
-        return null
-      }catch{
-        let match1 = jstr.match(/\{\"cmd\":\"DANMU_MSG\"/)
-        if (match1) {
-          // console.log(match1)
-          let match2 = jstr.match(/\"info\":\[.*\],\"(.*?)\"\,/)
-          if (match2) {
-            // console.log(match2)
-            return match2[1].length <= 20 ? match2[1] : null
-          }
-        }
-        return null
+
+      let len = 0
+      let danmu = []
+      while (len < data.length) {
+        // let lenData = data.subarray(len,len+4)
+        let nextLen = data[len+2]*256 + data[len+3]
+        let jstr = new TextDecoder('utf-8').decode(data.subarray(len+16, len+nextLen))
+        len += nextLen
+        try{
+          const jo = JSON.parse(jstr)
+          // console.log(jo)
+          if (jo.cmd == "DANMU_MSG") danmu.push(jo.info[1])
+        }catch{}
       }
+
+      return danmu
+
+      // let jstr = new TextDecoder('utf-8').decode(sp)
+      // // console.log(typeof jstr)
+      // try{
+      //   const jo = JSON.parse(jstr)
+      //   console.log(jo)
+      //   if (jo.cmd == "DANMU_MSG") return jo.info[1]
+      //   return null
+      // }catch{
+      //   let match1 = jstr.match(/\{\"cmd\":\"DANMU_MSG\"/)
+      //   if (match1) {
+      //     // console.log(match1)
+      //     let match2 = jstr.match(/\"info\":\[.*\],\"(.*?)\"\,/)
+      //     if (match2) {
+      //       // console.log(match2)
+      //       return match2[1].length <= 20 ? match2[1] : null
+      //     }
+      //   }
+      //   return null
+      // }
       // try {
       //   const jo = JSON.parse(jstr.trim())
       //   // console.log(jo)
@@ -245,12 +268,34 @@ export default {
     },
     toggleDanmu() {
       this.showDanmu = !this.showDanmu
+    },
+    keepPlay() {
+      this.videoCtx.play()
+    },
+    pause() {
+      this.videoCtx.pause()
     }
   }
 }
 </script>
 
 <style>
+@font-face {
+  font-family: 'iconfont';
+  src: url('/static/iconfont/iconfont.eot');
+  src: url('/static/iconfont/iconfont.eot?#iefix') format('embedded-opentype'),
+      url('/static/iconfont/iconfont.woff2') format('woff2'),
+      url('/static/iconfont/iconfont.woff') format('woff'),
+      url('/static/iconfont/iconfont.ttf') format('truetype'),
+      url('/static/iconfont/iconfont.svg#iconfont') format('svg');
+}
+.iconfont {
+  font-family: "iconfont" !important;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 18px;
+}
 .player-container {
   flex: 1;
   display: flex;
@@ -281,11 +326,12 @@ export default {
   white-space: nowrap;
   width: 0;
 }
-.muted {
+.active {
   background-color: rgba(0, 0, 0, .6);
 }
 .danmu {
   font-size: 13px;
   background-color: rgba(0, 0, 0, .6);
+  white-space: pre-wrap;
 }
 </style>

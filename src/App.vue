@@ -9,6 +9,9 @@
 		},
 		onHide: function() {
 			console.log('App Hide')
+		},
+		globalData: {
+			autoCloseTime: 0
 		}
 	}
 </script>
