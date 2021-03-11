@@ -332,6 +332,5 @@ export default {
 .danmu {
   font-size: 13px;
   background-color: rgba(0, 0, 0, .6);
-  white-space: pre-wrap;
 }
 </style>

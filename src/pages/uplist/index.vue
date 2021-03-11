@@ -133,7 +133,7 @@ export default {
         }, e => {
           console.log(e.index)
           if (e.index > 0) {
-            if (e.index >= 9) {
+            if (e.index == 9) {
               this.$set(this.liveids, i-1, 0)
             }else{
               let idx = e.index - 1
@@ -163,6 +163,8 @@ export default {
     },
     saveItemClick(i) {
       let buttons = []
+      buttons.push({title: '跳转到该直播间'})
+      // buttons.push({title: '复制直播id：'+this.saveids[i]})
       for (let j = 1; j <= 9; j++) {
         buttons.push({title: "窗口"+j})
       }
@@ -174,14 +176,24 @@ export default {
       }, e => {
         console.log(e.index)
         if (e.index > 0) {
-          if (e.index >= 9) {
+          if (e.index == 1) {
+            // uni.setClipboardData({
+            //   data: this.saveids[i],
+            //   success() {
+            //     uni.showToast({
+            //       title: '已复制'
+            //     })
+            //   }
+            // })
+            plus.runtime.openURL('bilibili://live/'+this.saveids[i])
+          }else if (e.index == 10) {
             this.saveids.splice(i, 1)
             uni.setStorageSync("saveids", this.saveids.join(" "))
-          }else{
-            while (e.index - 1 > this.liveids.length) {
+          }else if (e.index > 1 && e.index < 10) {
+            while (e.index - 2 > this.liveids.length) {
               this.liveids.push(0)
             }
-            this.$set(this.liveids, e.index-1, this.saveids[i])
+            this.$set(this.liveids, e.index-2, this.saveids[i])
             // this.liveids[e.index-1] = liveid
             uni.setStorageSync("liveids", this.liveids.join(" "))
             

@@ -6,6 +6,7 @@
       <view class="btn iconfont" @click="muteAll">&#xe747;</view>
       <view class="btn iconfont" @click="danmuCloseAll">&#xe696;</view>
       <view style="flex:1"></view>
+      <view class="btn right iconfont" @click="openMessage">&#xe69d;</view>
       <view class="btn right iconfont" @click="openTimerOption">&#xe645;{{autoCloseMinute>0?autoCloseMinute:''}}</view>
       <view :class="'btn right iconfont' + (lockLandscape ? ' active' : '')" @click="toggleLandscape">&#xe664;</view>
       <view class="btn right iconfont" @click="openLayoutOption">&#xebe5;</view>
@@ -42,6 +43,10 @@ export default {
     };
   },
   onLoad() {
+    if (!uni.getStorageSync('showMessage')) {
+      this.openMessage()
+    }
+
     const saveids = uni.getStorageSync('liveids')
     if (saveids) {
       this.saveids = saveids.split(" ")
@@ -60,9 +65,10 @@ export default {
           success(res) {
             // console.log(res)
             const newStatus = res.data.data.room_info.live_status
-            if (newStatus == 1 && that.liveStatus[liveid] == 0) {
+            if (newStatus == 1 && that.liveStatus.hasOwnProperty(liveid) && that.liveStatus[liveid] == 0) {
               uni.showToast({
-                title: res.data.data.anchor_info.base_info.uname + ' 开播了'
+                title: res.data.data.anchor_info.base_info.uname + ' 开播了',
+                icon: 'none'
               })
             }
             
@@ -223,6 +229,23 @@ export default {
       uni.navigateTo({
         url: '/pages/timerOption/index'
       })
+    },
+    openMessage() {
+      uni.showModal({
+        title: '欢迎',
+        content: '· 点击右上角"编辑"按钮添加直播UP主。\n· 请注意宽带网速、流量消耗、电池电量、机身发热、系统卡顿等软硬件环境问题。',
+        // cancelText: '关闭',
+        // confirmText: '前往点赞👍',
+        showCancel: false,
+        success(res) {
+          console.log(res)
+          uni.setStorageSync('showMessage', 1)
+          if (res.confirm) {
+            // plus.runtime.openURL('bilibili://live/5050')
+          }
+
+        }
+      })
     }
   },
   destroyed() {
@@ -246,7 +269,7 @@ export default {
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  line-height: 18px;
+  line-height: 20px;
 }
 body {
   background-color: #31363b;
