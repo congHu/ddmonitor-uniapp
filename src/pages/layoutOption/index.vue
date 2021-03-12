@@ -9,6 +9,8 @@
       <!--  -->
     <view v-for="i in 16" :key="i-1" class="layout-item" :style="'background-position: '+(((i-1)%4)*33.33)+'% '+(Math.floor((i-1)/4)*33.33)+'%'" @click="selectLayout(i-1)">
     </view>
+    <view v-for="i in 3" :key="i+15" class="layout-item layout-ex1" :style="'background-position: '+(((i-1)%3)*50)+'% 0'" @click="selectLayout(i+15)">
+    </view>
     <!-- </view> -->
     
   </view>
@@ -56,5 +58,10 @@ body {
   background-size: 400%;
   /* background-position: 33.33% 33.33%; */
   float: left;
+}
+.layout-ex1 {
+  background-image: url('/static/layout_ex1.png');
+  background-size: 300%;
+
 }
 </style>

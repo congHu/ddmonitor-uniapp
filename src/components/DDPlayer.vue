@@ -19,15 +19,48 @@
       @ended="videoended"
       @error="videoerr"
     >
-      <cover-view class="danmu" v-show="showDanmu" v-for="(d,i) in danmuList" :key="i">
+      <cover-view class="danmu" v-show="showDanmu && !showDanmuOptions" v-for="(d,i) in danmuList" :key="i" :style="danmuPositionStyle(i)">
         {{d}}
+      </cover-view>
+      <cover-view style="top:0px" class="danmu-options" v-show="showDanmu && showDanmuOptions">
+        弹幕设置
+      </cover-view>
+      <cover-view style="top:32px" class="danmu-options" v-show="showDanmu && showDanmuOptions">
+        位置
+      </cover-view>
+      <cover-view style="top:32px;left:32px" class="danmu-options btn" v-show="showDanmu && showDanmuOptions" @click="danmuPosOption('lt')">
+        {{danmuPos=='lt'?'√':''}}左上
+      </cover-view>
+      <cover-view style="top:32px;left:80px" class="danmu-options btn" v-show="showDanmu && showDanmuOptions" @click="danmuPosOption('lb')">
+        {{danmuPos=='lb'?'√':''}}左下
+      </cover-view>
+      <cover-view style="top:32px;left:128px" class="danmu-options btn" v-show="showDanmu && showDanmuOptions" @click="danmuPosOption('rt')">
+        {{danmuPos=='rt'?'√':''}}右上
+      </cover-view>
+      <cover-view style="top:32px;left:172px" class="danmu-options btn" v-show="showDanmu && showDanmuOptions" @click="danmuPosOption('rb')">
+        {{danmuPos=='rb'?'√':''}}右下
+      </cover-view>
+      <cover-view style="top:64px" class="danmu-options" v-show="showDanmu && showDanmuOptions">
+        数量
+      </cover-view>
+      <cover-view style="top:64px;left:32px" class="danmu-options btn" v-show="showDanmu && showDanmuOptions" @click="danmuCountOption(2)">
+        {{danmuCount==2?'√':''}}2条
+      </cover-view>
+      <cover-view style="top:64px;left:72px" class="danmu-options btn" v-show="showDanmu && showDanmuOptions" @click="danmuCountOption(5)">
+        {{danmuCount==5?'√':''}}5条
+      </cover-view>
+      <cover-view style="top:64px;left:120px" class="danmu-options btn" v-show="showDanmu && showDanmuOptions" @click="danmuCountOption(10)">
+        {{danmuCount==10?'√':''}}10条
+      </cover-view>
+      <cover-view style="top:96px" class="danmu-options" v-show="showDanmu && showDanmuOptions" @click="danmuOptionFinish">
+        完成
       </cover-view>
     </video>
     <view class="toolbar">
       <view class="btn iconfont" @click="loadUrl">&#xe618;</view>
       <view :class="'btn iconfont' + (isMuted ? ' active' : '')" @click="toggleMute">&#xe747;</view>
       <view :class="'btn iconfont' + (showDanmu ? '' : ' active')" @click="toggleDanmu">&#xe696;</view>
-      <view class="upname">{{upname}}</view>
+      <view class="upname" @click="goChangeLiveId">#{{id+1}}: {{liveid==0||isLive==1?'':'(未开播)'}} {{upname?upname:'空'}}</view>
     </view>
   </view>
 </template>
@@ -45,13 +78,21 @@ export default {
       isMuted: false,
       videoCtx: null,
       upname: '',
+      isLive: 0,
       socketTask: null,
       socketTimer: null,
       danmuList: [],
-      showDanmu: true
+      showDanmu: true,
+      showDanmuOptions: false,
+      danmuPos: 'lt',
+      danmuCount: 5,
     }
   },
   props: {
+    id: {
+      type: Number,
+      default: 0
+    },
     liveid: {
       type: String,
       default: "0"
@@ -63,6 +104,18 @@ export default {
   },
   mounted() {
     this.videoCtx = uni.createVideoContext("live"+this.$props.liveid)
+
+    let layout = uni.getStorageSync("layout")
+    if (isNaN(layout)) {
+      layout = 3
+    }
+    let danmu = uni.getStorageSync("danmu-layout"+layout+"-"+this.$props.id)
+    if (danmu) {
+      let danmuOptions = danmu.split(" ")
+      this.danmuPos = danmuOptions[0]
+      this.danmuCount = danmuOptions[1]
+    }
+
     this.loadUrl()
   },
   // watch: {
@@ -81,6 +134,8 @@ export default {
       if (this.videoCtx) this.videoCtx.stop()
       this.url = ''
       this.upname = ''
+      if (this.$props.liveid <= 0) return
+      this.upname = '...'
       let that = this
       uni.request({
         url: 'https://api.live.bilibili.com/room/v1/Room/playUrl?cid='+this.$props.liveid+'&platform=web&qn='+this.$props.qn,
@@ -118,6 +173,8 @@ export default {
           // console.log(res)
           try {
             that.upname = res.data.data.anchor_info.base_info.uname
+            console.log(res.data.data.room_info.live_status)
+            that.isLive = res.data.data.room_info.live_status
             const roomid = res.data.data.room_info.room_id
 
             that.socketTask = socket.connectSocket({
@@ -169,7 +226,7 @@ export default {
                     //   color: '#ffffff'
                     // })
                     that.danmuList.push(...danmu)
-                    if (that.danmuList.length > 5) that.danmuList.splice(0,that.danmuList.length-5)
+                    if (that.danmuList.length > that.danmuCount) that.danmuList.splice(0,that.danmuList.length-that.danmuCount)
                   }
                 }catch{
 
@@ -267,13 +324,62 @@ export default {
       this.showDanmu = false
     },
     toggleDanmu() {
-      this.showDanmu = !this.showDanmu
+      if (this.showDanmu) {
+        if (this.showDanmuOptions) {
+          this.showDanmuOptions = false
+          this.saveDanmuOptions()
+        }else{
+          this.showDanmu = false
+        }
+      }else{
+        this.showDanmu = true
+        this.showDanmuOptions = true
+      }
+      
     },
     keepPlay() {
       this.videoCtx.play()
     },
     pause() {
       this.videoCtx.pause()
+    },
+    goChangeLiveId() {
+      uni.navigateTo({
+        url: '/pages/uplist/index?layoutId='+this.$props.id
+      })
+    },
+    danmuPositionStyle(i) {
+      let styleString = ''
+      if (this.danmuPos.startsWith('r')) {
+        styleString += 'right:0;'
+      }
+      if (this.danmuPos.endsWith('t')) {
+        styleString += 'top:' + (i*16) + 'px'
+      }else if (this.danmuPos.endsWith('b')) {
+        styleString += 'bottom:' + ((this.danmuCount - i - 1)*16) + 'px'
+      }
+      return styleString
+    },
+    danmuPosOption(pos) {
+      this.danmuPos = pos
+    },
+    danmuCountOption(count) {
+      this.danmuCount = count
+      if (this.danmuList.length > this.danmuCount) {
+        this.danmuList.splice(0, this.danmuList.length - this.danmuCount)
+      }
+    },
+    danmuOptionFinish() {
+      this.showDanmuOptions = false
+
+      this.saveDanmuOptions()
+    },
+    saveDanmuOptions() {
+      let layout = uni.getStorageSync("layout")
+      if (isNaN(layout)) {
+        layout = 3
+      }
+      uni.setStorageSync("danmu-layout"+layout+"-"+this.$props.id, this.danmuPos + ' ' + this.danmuCount)
     }
   }
 }
@@ -332,5 +438,17 @@ export default {
 .danmu {
   font-size: 13px;
   background-color: rgba(0, 0, 0, .6);
+  line-height: 1.3;
+  position: absolute;
+}
+.danmu-options {
+  font-size: 15px;
+  background-color: rgba(0, 0, 0, .6);
+  line-height: 1.4;
+  position: absolute;
+}
+.danmu-options.btn {
+  /* border: 1px solid #808080; */
+  /* color: #a0a0a0; */
 }
 </style>

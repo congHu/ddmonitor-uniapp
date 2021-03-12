@@ -10,7 +10,7 @@
       <view class="btn right iconfont" @click="openTimerOption">&#xe645;{{autoCloseMinute>0?autoCloseMinute:''}}</view>
       <view :class="'btn right iconfont' + (lockLandscape ? ' active' : '')" @click="toggleLandscape">&#xe664;</view>
       <view class="btn right iconfont" @click="openLayoutOption">&#xebe5;</view>
-      <view class="btn right iconfont" @click="openUpList">&#xe64f;</view>
+      <view class="btn right iconfont highlight" @click="openUpList">&#xe64f;编辑</view>
     </view>
     <DDLayouts :layout="layout" :liveids="liveids" ref="dd" />
 
@@ -55,29 +55,29 @@ export default {
       uni.setStorageSync('saveids', this.saveids.join(" "))
     }
     
-    setInterval(() => {
-      // console.log("saveids", this.saveids)
-      this.saveids.forEach(liveid => {
-        let that = this
-        // console.log('https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id=' + liveid)
-        uni.request({
-          url: 'https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id=' + liveid,
-          success(res) {
-            // console.log(res)
-            const newStatus = res.data.data.room_info.live_status
-            if (newStatus == 1 && that.liveStatus.hasOwnProperty(liveid) && that.liveStatus[liveid] == 0) {
-              uni.showToast({
-                title: res.data.data.anchor_info.base_info.uname + ' 开播了',
-                icon: 'none'
-              })
-            }
+    // setInterval(() => {
+    //   // console.log("saveids", this.saveids)
+    //   this.saveids.forEach(liveid => {
+    //     let that = this
+    //     // console.log('https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id=' + liveid)
+    //     uni.request({
+    //       url: 'https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id=' + liveid,
+    //       success(res) {
+    //         // console.log(res)
+    //         const newStatus = res.data.data.room_info.live_status
+    //         if (newStatus == 1 && that.liveStatus.hasOwnProperty(liveid) && that.liveStatus[liveid] == 0) {
+    //           uni.showToast({
+    //             title: res.data.data.anchor_info.base_info.uname + ' 开播了',
+    //             icon: 'none'
+    //           })
+    //         }
             
-            that.$set(that.liveStatus, liveid, newStatus)
+    //         that.$set(that.liveStatus, liveid, newStatus)
 
-          }
-        })
-      })
-    }, 10000);
+    //       }
+    //     })
+    //   })
+    // }, 10000);
 
     setInterval(() => {
       let time = getApp().globalData.autoCloseTime
@@ -126,6 +126,8 @@ export default {
         layoutChanged = true
         this.layout = layout
       }
+    }else{
+      uni.setStorageSync('layout', this.layout)
     }
 
     const info = uni.getSystemInfoSync()
@@ -232,11 +234,10 @@ export default {
     },
     openMessage() {
       uni.showModal({
-        title: '欢迎',
-        content: '· 点击右上角"编辑"按钮添加直播UP主。\n· 请注意宽带网速、流量消耗、电池电量、机身发热、系统卡顿等软硬件环境问题。',
-        // cancelText: '关闭',
-        // confirmText: '前往点赞👍',
-        showCancel: false,
+        title: 'DD监控器v1.0.8 by CongHu',
+        content: '· 点击右上角"编辑"按钮添加直播UP主。\n· 观看多个直播时请注意宽带网速、流量消耗、电池电量、机身发热、系统卡顿等软硬件环境问题。',
+        cancelText: '关闭',
+        confirmText: 'B站视频',
         success(res) {
           console.log(res)
           uni.setStorageSync('showMessage', 1)
@@ -308,5 +309,8 @@ DDLayout {
 }
 .active {
   background-color: rgba(0, 0, 0, .6);
+}
+.highlight {
+  background-color: #033b66;
 }
 </style>
