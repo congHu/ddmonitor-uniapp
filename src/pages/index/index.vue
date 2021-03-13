@@ -234,7 +234,7 @@ export default {
     },
     openMessage() {
       uni.showModal({
-        title: 'DD监控器v1.0.8 by CongHu',
+        title: 'DD监控器v1.0.9 by CongHu',
         content: '· 点击右上角"编辑"按钮添加直播UP主。\n· 观看多个直播时请注意宽带网速、流量消耗、电池电量、机身发热、系统卡顿等软硬件环境问题。',
         cancelText: '关闭',
         confirmText: 'B站视频',

@@ -232,6 +232,8 @@ export default {
         }, 30000);
       })
       that.socketTask.onMessage((data) => {
+        if (that.isDestroying) return
+
         // console.log("socket msg", roomid)
         const bytes = new Uint8Array(data.data)
         if (bytes[7] == 2) {
