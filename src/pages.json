@@ -24,6 +24,21 @@
 			"style": {
 				"navigationBarTitleText": "定时关闭"
 			}
+		},
+		{
+			"path": "pages/uidImport/index",
+			"style": {
+				"navigationBarTitleText": "导入",
+				"app-plus": {  
+					"softinputNavBar": "none",
+					"titleNView": {  
+						"buttons": [{  
+							"text": "完成",
+							"fontSize": "13px"
+						}]  
+					}  
+				}
+			}
 		}
 	],
 	"globalStyle": {

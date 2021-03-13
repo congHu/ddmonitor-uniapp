@@ -86,6 +86,7 @@ export default {
       showDanmuOptions: false,
       danmuPos: 'lt',
       danmuCount: 5,
+      isDestroying: false,
     }
   },
   props: {
@@ -117,6 +118,17 @@ export default {
     }
 
     this.loadUrl()
+  },
+  beforeDestroy() {
+    this.isDestroying = true
+    if (this.socketTask) {
+      this.socketTask.close()
+    }
+    this.danmuList = []
+    if (this.socketTimer) clearInterval(this.socketTimer)
+    if (this.videoCtx) this.videoCtx.stop()
+    this.url = ''
+    this.upname = ''
   },
   // watch: {
   //   liveid(newVal, oldVal) {
@@ -177,80 +189,90 @@ export default {
             that.isLive = res.data.data.room_info.live_status
             const roomid = res.data.data.room_info.room_id
 
-            that.socketTask = socket.connectSocket({
-              url: 'wss://broadcastlv.chat.bilibili.com/sub',
-              complete() {}
-            })
-
-            that.socketTask.onOpen((res) => {
-              console.log("socket open", roomid)
-              const reqStr = JSON.stringify({"roomid":roomid})
-              let data = [
-                0,0,0,reqStr.length+16,
-                0,16,0,1,
-                0,0,0,7,
-                0,0,0,1
-              ]
-              // const payload = data.concat(...(new TextEncoder()).encode(reqStr))
-              for (let i = 0; i < reqStr.length; i++) {
-                data.push(reqStr.charCodeAt(i));
-              }
-              console.log(data)
-              that.socketTask.send({
-                data: new Uint8Array(data).buffer,
-              })
-              that.socketTimer = setInterval(() => {
-                that.socketTask.send({
-                  data: new Uint8Array([0,0,0,16,0,16,0,1,0,0,0,2,0,0,0,1]).buffer
-                })
-              }, 30000);
-            })
-            that.socketTask.onMessage((data) => {
-              // console.log("socket msg", roomid)
-              const bytes = new Uint8Array(data.data)
-              if (bytes[7] == 2) {
-                try {
-                  const unziped = pako.inflate(bytes.slice(16,bytes.length))
-                  // console.log(unziped)
-                  // let td = new TextDecoder('utf-8')
-                  // try{
-
-                  // }catch{
-
-                  // }
-                  const danmu = that.getDanmu(unziped)
-                  if (danmu) {
-                    // console.log("danmu", roomid, danmu)
-                    // that.videoCtx.sendDanmu({
-                    //   text: danmu,
-                    //   color: '#ffffff'
-                    // })
-                    that.danmuList.push(...danmu)
-                    if (that.danmuList.length > that.danmuCount) that.danmuList.splice(0,that.danmuList.length-that.danmuCount)
-                  }
-                }catch{
-
-                }
-                
-              }
-              // else{
-              //   const danmu = that.getDanmu(bytes)
-              //   if (danmu) {
-              //     console.log("danmu", roomid, danmu)
-              //   }
-              // }
-            })
-            that.socketTask.onClose((res) => {
-              console.log('socker close', roomid, res);
-            })
-            that.socketTask.onError((err) => {
-              console.log("ws err", err)
-            })
+            that.connectSocket(roomid)
             
 
           }catch{
           }
         }
+      })
+    },
+    connectSocket(roomid) {
+      let that = this
+      that.socketTask = socket.connectSocket({
+        url: 'wss://broadcastlv.chat.bilibili.com/sub',
+        complete() {}
+      })
+
+      that.socketTask.onOpen((res) => {
+        console.log("socket open", roomid)
+        const reqStr = JSON.stringify({"roomid":roomid})
+        let data = [
+          0,0,0,reqStr.length+16,
+          0,16,0,1,
+          0,0,0,7,
+          0,0,0,1
+        ]
+        // const payload = data.concat(...(new TextEncoder()).encode(reqStr))
+        for (let i = 0; i < reqStr.length; i++) {
+          data.push(reqStr.charCodeAt(i));
+        }
+        console.log(data)
+        that.socketTask.send({
+          data: new Uint8Array(data).buffer,
+        })
+        that.socketTask.send({
+          data: new Uint8Array([0,0,0,16,0,16,0,1,0,0,0,2,0,0,0,1]).buffer
+        })
+        that.socketTimer = setInterval(() => {
+          console.log("heartbeat")
+          that.socketTask.send({
+            data: new Uint8Array([0,0,0,16,0,16,0,1,0,0,0,2,0,0,0,1]).buffer
+          })
+        }, 30000);
+      })
+      that.socketTask.onMessage((data) => {
+        // console.log("socket msg", roomid)
+        const bytes = new Uint8Array(data.data)
+        if (bytes[7] == 2) {
+          try {
+            const unziped = pako.inflate(bytes.slice(16,bytes.length))
+            // console.log(unziped)
+            // let td = new TextDecoder('utf-8')
+            // try{
+
+            // }catch{
+
+            // }
+            const danmu = that.getDanmu(unziped)
+            if (danmu) {
+              console.log("danmu", roomid, danmu)
+              // that.videoCtx.sendDanmu({
+              //   text: danmu,
+              //   color: '#ffffff'
+              // })
+              that.danmuList.push(...danmu)
+              if (that.danmuList.length > that.danmuCount) that.danmuList.splice(0,that.danmuList.length-that.danmuCount)
+            }
+          }catch{
+
+          }
+          
+        }
+        // else{
+        //   const danmu = that.getDanmu(bytes)
+        //   if (danmu) {
+        //     console.log("danmu", roomid, danmu)
+        //   }
+        // }
+      })
+      that.socketTask.onClose((res) => {
+        console.log('socket close', roomid, res);
+        // if (!that.isDestroying) that.connectSocket(roomid)
+      })
+      that.socketTask.onError((err) => {
+        console.log("socket err", err)
+        // if (!that.isDestroying) that.connectSocket(roomid)
       })
     },
     toggleMute() {

@@ -47,7 +47,7 @@
       <view class="list-title-view">
         <span class="list-title">{{isNaN(layoutId)?'你的列表':('更换窗口#'+(layoutId+1)+'的UP主')}}</span>
         <span class="list-title-btn" @click="addByLiveid">添加</span>
-        <!-- <span style="margin-left:8px;border: 1px solid #808080;padding:4px" @click="addByImport">导入</span> -->
+        <span class="list-title-btn" @click="addByImport">导入</span>
       </view>
 
       <view class="list-item" hover-class="list-item-hover" v-for="(liveid,i) in saveids" :key="liveid" @click="saveItemClick(i)">
@@ -79,12 +79,20 @@ export default {
   },
   onLoad(options) {
     this.layoutId = parseInt(options.layoutId)
+  },
+  onShow() {
+    const info = uni.getSystemInfoSync()
+    this.safeAreaInsetsTop = info.safeAreaInsets.top
+    // this.safeHeight = info.safeArea.height
 
     let liveids = uni.getStorageSync('liveids')
-    console.log(typeof this.liveids)
     if (liveids) {
       this.liveids = liveids.split(" ")
     }
+    this.liveids.forEach(liveid => {
+      this.loadLiveInfo(liveid)
+    })
+
     let saveids = uni.getStorageSync('saveids')
     if (saveids) {
       this.saveids = saveids.split(" ")
@@ -92,18 +100,9 @@ export default {
       this.saveids = [47377,8792912,21652717,213]
       uni.setStorageSync('saveids', this.saveids.join(" "))
     }
-    
-    this.liveids.forEach(liveid => {
-      this.loadLiveInfo(liveid)
-    })
     this.saveids.forEach(liveid => {
       this.loadLiveInfo(liveid)
     })
-  },
-  onShow() {
-    const info = uni.getSystemInfoSync()
-    this.safeAreaInsetsTop = info.safeAreaInsets.top
-    // this.safeHeight = info.safeArea.height
   },
   methods: {
     loadLiveInfo(liveid,add=false) {
@@ -162,12 +161,9 @@ export default {
       }, "输入UP主直播房间id")
     },
     addByImport() {
-      plus.nativeUI.prompt("只抓取你的公开关注列表", (res) => {
-        console.log(res)
-        if (res.index == 0) {
-          res.value
-        }
-      }, "你的uid")
+      uni.navigateTo({
+        url: '/pages/uidImport/index'
+      })
     },
     layoutItemClick(i) {
       if (i <= this.liveids.length && !isNaN(this.liveids[i-1]) && this.liveids[i-1] > 0) {
