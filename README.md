@@ -1,5 +1,8 @@
 # ddmonitor-uniapp
 
+## iOS版
+该版本在iOS运行不正常。请前往[https://github.com/congHu/DD_Monitor-Universal-Swift](https://github.com/congHu/DD_Monitor-Universal-Swift)。
+
 ## 说明
 
 - 第一版就这么先出炉了。
