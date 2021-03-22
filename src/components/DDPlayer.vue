@@ -2,7 +2,7 @@
   <view class="player-container">
     <video
       class="video-player"
-      :id="'live'+liveid"
+      :id="'live'+id"
       :src="url" 
       :autoplay="true"
 
@@ -74,6 +74,7 @@ require('fast-text-encoding')
 export default {
   data() {
     return {
+      liveid: 0,
       url: '',
       isMuted: false,
       videoCtx: null,
@@ -94,17 +95,17 @@ export default {
       type: Number,
       default: 0
     },
-    liveid: {
-      type: String,
-      default: "0"
-    },
-    qn: {
-      type: Number, 
-      default: 250
-    },
+    // liveid: {
+    //   type: String,
+    //   default: "0"
+    // },
+    // qn: {
+    //   type: Number, 
+    //   default: 250
+    // },
   },
   mounted() {
-    this.videoCtx = uni.createVideoContext("live"+this.$props.liveid)
+    this.videoCtx = uni.createVideoContext("live"+this.liveid)
 
     let layout = uni.getStorageSync("layout")
     if (isNaN(layout)) {
@@ -117,7 +118,7 @@ export default {
       this.danmuCount = danmuOptions[1]
     }
 
-    this.loadUrl()
+    // this.loadUrl()
   },
   beforeDestroy() {
     this.isDestroying = true
@@ -137,20 +138,21 @@ export default {
   // },
   methods: {
     loadUrl() {
-      console.log('this.$props.liveid',this.$props.liveid)
+      console.log('this.liveid',this.liveid)
       if (this.socketTask) {
         this.socketTask.close()
       }
       this.danmuList = []
       if (this.socketTimer) clearInterval(this.socketTimer)
-      if (this.videoCtx) this.videoCtx.stop()
+      if (this.videoCtx) 
+        this.videoCtx.stop()
       this.url = ''
       this.upname = ''
-      if (this.$props.liveid <= 0) return
+      if (this.liveid <= 0) return
       this.upname = '...'
       let that = this
       uni.request({
-        url: 'https://api.live.bilibili.com/room/v1/Room/playUrl?cid='+this.$props.liveid+'&platform=web&qn='+this.$props.qn,
+        url: 'https://api.live.bilibili.com/room/v1/Room/playUrl?cid='+this.liveid+'&platform=web&qn=80', //+this.$props.qn
         success(res) {
           console.log(res)
 
@@ -180,7 +182,7 @@ export default {
       })
 
       uni.request({
-        url: 'https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id=' + this.$props.liveid,
+        url: 'https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id=' + this.liveid,
         success(res) {
           // console.log(res)
           try {
@@ -248,7 +250,7 @@ export default {
             // }
             const danmu = that.getDanmu(unziped)
             if (danmu) {
-              console.log("danmu", roomid, danmu)
+              // console.log("danmu", roomid, danmu)
               // that.videoCtx.sendDanmu({
               //   text: danmu,
               //   color: '#ffffff'
@@ -368,9 +370,41 @@ export default {
       this.videoCtx.pause()
     },
     goChangeLiveId() {
-      uni.navigateTo({
-        url: '/pages/uplist/index?layoutId='+this.$props.id
+      let buttons = []
+      if (this.liveid > 0) {
+        buttons = [{title: "打开B站APP直播间"},{title: "更换UP主"},{title: "关闭此窗口", style: "destructive"}]
+      }else{
+        buttons = [{title: "更换UP主"}]
+      }
+      plus.nativeUI.actionSheet({
+        title: '操作',
+        buttons: buttons,
+        cancel: '取消'
+      }, e => {
+        if (this.liveid > 0) {
+          if (e.index == 1) {
+            plus.runtime.openURL('bilibili://live/'+this.liveid)
+          }else if (e.index == 2) {
+            uni.navigateTo({
+              url: '/pages/uplist/index?layoutId='+this.$props.id
+            })
+          }else if (e.index == 3) {
+            this.liveid = 0
+            this.$nextTick(()=>{
+              this.loadUrl()
+            })
+            
+          }
+        }else{
+          if (e.index == 1) {
+            uni.navigateTo({
+              url: '/pages/uplist/index?layoutId='+this.$props.id
+            })
+          }
+        }
+        
       })
+      
     },
     danmuPositionStyle(i) {
       let styleString = ''
@@ -403,7 +437,7 @@ export default {
       if (isNaN(layout)) {
         layout = 3
       }
-      uni.setStorageSync("danmu-layout"+layout+"-"+this.$props.id, this.danmuPos + ' ' + this.danmuCount)
+      uni.setStorageSync("danmu-layout"+layout+"-"+this.id, this.danmuPos + ' ' + this.danmuCount)
     }
   }
 }

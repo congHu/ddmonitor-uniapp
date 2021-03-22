@@ -12,7 +12,8 @@
       <view class="btn right iconfont" @click="openLayoutOption">&#xebe5;</view>
       <view class="btn right iconfont highlight" @click="openUpList">&#xe64f;编辑</view>
     </view>
-    <DDLayouts :layout="layout" :liveids="liveids" ref="dd" />
+    <DDLayouts ref="dd" />
+    <!-- :layout="layout" :liveids="liveids" -->
 
   </view>
 </template>
@@ -195,6 +196,8 @@ export default {
   methods: {
     refreshAll() {
       console.log("index refresh")
+      this.$refs.dd.layout = this.layout
+      this.$refs.dd.liveids = this.liveids
       this.$refs.dd.refreshAll()
     },
     muteAll() {

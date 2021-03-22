@@ -183,19 +183,20 @@ export default {
   components: { DDPlayer },
   data() {
     return {
-      
+      layout: 3,
+      liveids: []
     }
   },
-  props: {
-    layout: {
-      type: Number,
-      default: 0
-    },
-    liveids: {
-      type: Array, 
-      default: []
-    }
-  },
+  // props: {
+  //   layout: {
+  //     type: Number,
+  //     default: 0
+  //   },
+  //   liveids: {
+  //     type: Array, 
+  //     default: []
+  //   }
+  // },
   methods: {
     getLiveId(index) {
       if (index < this.liveids.length) {
@@ -208,6 +209,7 @@ export default {
       console.log("dd refresh")
       for (let i=0; i < 9; i++) {
         if (this.$refs['dd'+i]) {
+          this.$refs['dd'+i].liveid = this.liveids[i]
           this.$refs['dd'+i].loadUrl()
         }
       }

@@ -174,7 +174,7 @@ export default {
             cancel: '取消'
           }, e => {
             if (e.index == 1) {
-              plus.runtime.openURL('bilibili://live/'+this.saveids[i])
+              plus.runtime.openURL('bilibili://live/'+this.liveids[i-1])
             }else if (e.index == 2) {
               this.$set(this.liveids, i-1, 0)
             }

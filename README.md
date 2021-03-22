@@ -3,6 +3,9 @@
 ## iOS版
 该版本在iOS运行不正常。请前往[https://github.com/congHu/DD_Monitor-Universal-Swift](https://github.com/congHu/DD_Monitor-Universal-Swift)。
 
+## 安卓版
+在Release中下载apk使用。安卓版也在重构中。
+
 ## 说明
 
 - 第一版就这么先出炉了。
