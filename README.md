@@ -1,10 +1,11 @@
 # ddmonitor-uniapp
 
-## iOS版
-该版本在iOS运行不正常。请前往[https://github.com/congHu/DD_Monitor-Universal-Swift](https://github.com/congHu/DD_Monitor-Universal-Swift)。
+## 此项目不在维护
+### iOS版
+该版本在iOS播放不正常。请前往[https://github.com/congHu/DD_Monitor-Universal-Swift](https://github.com/congHu/DD_Monitor-Universal-Swift)。
 
-## 安卓版
-在Release中下载apk使用。安卓版也在重构中。
+### 安卓版
+该版本无法调节各个播放器的音量，还存在socket断开的问题，请前往原生版本[https://github.com/congHu/DD_Monitor-android-kotlin](https://github.com/congHu/DD_Monitor-android-kotlin)
 
 ## 说明
 
